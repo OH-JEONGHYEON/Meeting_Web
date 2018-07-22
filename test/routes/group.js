@@ -4,7 +4,7 @@ module.exports = function(models) {
   var route = express.Router();
 
   route.get('/add', async (req,res) => {
-    await models.Group.bulkCreate([
+    await models.favorite.bulkCreate([
       {
         groupname: "웹",
         unum: "1"
@@ -26,30 +26,11 @@ module.exports = function(models) {
       });
   });
 
-  route.get('/find', async (req,res) => {
-    await models.Group.findAll({
-      attributes: ['groupname'],
-      include: {
-        model: models.User,
-        attributes: ['username', 'userid']
-      },
-      raw: true,
-    }).then(data => {
-      res.json(data);
-    }).catch(err => {
-      res.send(err);
-    });
-  });
-
+  // 자신이 속한 그룹 보여주는 것.
   route.get('/find/query', async (req,res) => {
     var comm = "SELECT * FROM commit.group JOIN commit.user ON group.unum = user.unum;";
-    await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT })
-      .then(results => {
-        res.json(results);
-      })
-      .catch(err => {
-        res.send(err);
-      })
+    results = await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT })
+    if(results) { res.json(results) }
     });
 
   return route;
