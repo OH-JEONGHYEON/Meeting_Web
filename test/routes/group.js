@@ -28,7 +28,10 @@ module.exports = function(models) {
 
   // 자신이 속한 그룹 보여주는 것.
   route.get('/find/query', async (req,res) => {
-    var comm = "SELECT * FROM commit.group JOIN commit.user ON group.unum = user.unum;";
+    var comm = `SELECT * \
+    FROM commit.group JOIN commit.user \
+    ON group.unum = user.unum \
+    WHERE user.unum<>${req.user.unum};`;
     results = await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT })
     if(results) { res.json(results) }
     });
