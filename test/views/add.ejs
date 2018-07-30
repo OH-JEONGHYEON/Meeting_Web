@@ -24,8 +24,21 @@
   <button type="button" id="addFav">추가하기</button>
 </div>
 <p> </p>
-<div class="myFav" style="background-color:SandyBrown;">
+<div class="fav" style="background-color:SandyBrown;">
   <table id="Fav">
+    <tr>
+      <th>이름</th>
+      <th>회사</th>
+      <th>부서</th>
+      <th>직책</th>
+    </tr>
+  </table>
+</div>
+
+<p>---------↑즐겨찾는 계정---------------↓그룹---------------------</p>
+
+<div>
+  <table id="fav4group">
     <tr>
       <th>이름</th>
       <th>회사</th>
@@ -45,6 +58,7 @@
   function printFavorite(){
 
     $("#Fav").find("tr:gt(0)").remove(); // 첫번째행 빼고 다 지우기
+    $("#fav4group").find("tr:gt(0)").remove();
 
     var settings = {
       "async": true,
@@ -73,6 +87,19 @@
         </tr>
         `
         $("#Fav").append(data);
+      }
+
+      for(var i=0; i<response.length; i++){
+        var data = `
+        <tr onclick="check(this);">
+          <td>${response[i].username}</td>
+          <td>${response[i].comname}</td>
+          <td>${response[i].department}</td>
+          <td>${response[i].position}</td>
+          <td><input type="checkbox" name="check"></td>
+        </tr>
+        `
+        $("#fav4group").append(data);
       }
     });
   }
@@ -175,6 +202,12 @@
         printFavorite(); //즐겨찾는 계정 리스트 다시 프린트
       }
     });
+  }
+
+  function check(self){
+    $(self).toggle("fast", function(self){
+      $(self).css("outline", "5px dotted green");
+    })
   }
 
 </script>
