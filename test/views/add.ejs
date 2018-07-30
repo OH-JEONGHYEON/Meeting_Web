@@ -25,7 +25,7 @@
 </div>
 <p> </p>
 <div class="fav" style="background-color:SandyBrown;">
-  <table id="Fav">
+  <table id="fav">
     <tr>
       <th>이름</th>
       <th>회사</th>
@@ -38,8 +38,9 @@
 <p>---------↑즐겨찾는 계정---------------↓그룹---------------------</p>
 
 <div>
-  <table id="fav4group">
+  <table id="group">
     <tr>
+      <th>그룹</th>
       <th>이름</th>
       <th>회사</th>
       <th>부서</th>
@@ -57,8 +58,7 @@
   // 즐겨찾는 계정 전체 검색
   function printFavorite(){
 
-    $("#Fav").find("tr:gt(0)").remove(); // 첫번째행 빼고 다 지우기
-    $("#fav4group").find("tr:gt(0)").remove();
+    $("#fav").find("tr:gt(0)").remove(); // 첫번째행 빼고 다 지우기
 
     var settings = {
       "async": true,
@@ -86,20 +86,42 @@
           <td><button type="button" onclick=delFav(${response[i].unum})>삭제</button></td>
         </tr>
         `
-        $("#Fav").append(data);
+        $("#fav").append(data);
       }
+    });
+  }
 
+  function printGroup(){
+
+    $("#group").find("tr:gt(0)").remove();
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "/add/group",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Postman-Token": "3a24d6f9-c770-48f6-9f47-2f5a2054b8dc"
+      }
+    }
+
+    // response
+    // 검색 성공시: [{groupname, username, comname, department, position}]
+    // 검색 실패시: {message: ""}
+    $.ajax(settings).done(function (response) {
       for(var i=0; i<response.length; i++){
         var data = `
-        <tr onclick="check(this);">
+        <tr>
+          <td>${response[i].groupname}</td>
           <td>${response[i].username}</td>
           <td>${response[i].comname}</td>
           <td>${response[i].department}</td>
           <td>${response[i].position}</td>
-          <td><input type="checkbox" name="check"></td>
         </tr>
         `
-        $("#fav4group").append(data);
+        $("#group").append(data);
       }
     });
   }
@@ -218,6 +240,7 @@
   $(document).ready(function(){ // 처음 페이지 로드 시,
     $('#addFav').hide(); // 추가버튼 없애주고
     printFavorite(); // 즐겨찾는 계정 리스트 프린트
+    printGroup();
   });
 
 </script>

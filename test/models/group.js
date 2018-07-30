@@ -1,16 +1,14 @@
 module.exports = function (sequelize, Sequelize) {
   const group = sequelize.define('Group', {
-    gnum: { field: 'gnum', type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+    gnum: { field: 'gnum', type: Sequelize.INTEGER, unique: false, allowNull: false },
     groupname: { field: 'groupname', type: Sequelize.STRING(45), unique: false, allowNull: false },
-    user_unum: { field: 'unum', type: Sequelize.INTEGER, unique: false, allowNull: false},
+    UserUnum: { field: 'unum', type: Sequelize.INTEGER, unique: false, allowNull: false},
   }, {
-    // don't use camelcase for automatically added attributes but underscore style
-    // so updatedAt will be updated_at
-    underscored: true,
 
-    // disable the modification of tablenames; By default, sequelize will automatically
-    // transform all passed model names (first parameter of define) into plural.
-    // if you don't want that, set the following
+    timestamps: false,
+
+    // 테이블 이름 그대로
+    // 그 몽고디비처럼 복수로 저장되고 그런거 아님
     freezeTableName: true,
 
     // define the table's name

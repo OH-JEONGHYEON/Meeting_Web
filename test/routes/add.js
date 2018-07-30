@@ -4,14 +4,17 @@ module.exports = function(models) {
   var route = express.Router();
 
 
+  // 즐겨찾는 계정 및 그룹 추가 페이지
   route.get('/', (req,res) => {
     res.render('add');
   });
 
+  // 즐겨찾는 계정 목록
   route.get('/favorite', async (req,res) => {
     try {
       var comm = `SELECT U.unum, U.userid, U.username, U.comname, U.department, U.position \
-      FROM commit.favorite JOIN commit.user AS U ON favorite.fnum = U.unum;`;
+      FROM commit.favorite JOIN commit.user AS U ON favorite.fnum = U.unum\
+      WHERE favorite.unum=${req.user.unum};`;
       var results = await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT });
       if(results) { res.send(results); }
     } catch(err){
@@ -20,6 +23,7 @@ module.exports = function(models) {
     }
   });
 
+  // 아이디로 친구 검색
   route.post('/search', async (req,res) => {
     try {
       var user = await models.User.findOne({
@@ -42,7 +46,7 @@ module.exports = function(models) {
     }
   });
 
-  // 이 추가 작업할 때는 저한테 말씀해주세요
+  // 즐겨찾는 계정 추가
   route.post('/favorite', async (req,res) => {
     if(req.user.unum === req.body.fnum){
       req.flash('addError', '나 자신은 영원한 친구입니다. -카톡-');
@@ -84,6 +88,35 @@ module.exports = function(models) {
       return res.send({message: req.flash('delError')});
     }
   });
+
+  // 그룹 목록
+  route.get('/group', async (req,res) => {
+    var comm = `SELECT G.groupname, U.username, U.comname, U.department, U.position \
+    FROM commit.group AS G JOIN commit.user AS U \
+    ON G.unum = U.unum \
+    WHERE G.gnum=${req.user.unum};`;
+    results = await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT })
+    if(results) { res.json(results) }
+  });
+
+  // 그룹 추가
+  // 그룹 계정 어케 보내줄건지.... 가 솔직히 중요하진 않은가...
+  // 나는 생각이 없다...
+  // route.post('/group', async (req,res) => {
+  //   try {
+  //     for(var i=0;i<req.body.)
+  //     var result = await models.Group.create(
+  //       {
+  //         gnum: req.user.unum,
+  //         groupname: req.body.groupname,
+  //         unum: ,
+  //       });
+  //     res.send(null);
+  //   } catch(err) {
+  //     req.flash('addError', '이미 추가된 계정입니다.');
+  //     res.send({message: req.flash('addError')});
+  //   }
+  // });
 
   return route;
 };

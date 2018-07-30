@@ -9,13 +9,11 @@ module.exports = function (sequelize, Sequelize) {
     position: {field: 'position', type: Sequelize.STRING(45), allowNull: false },
     userimage: {field: 'userimage', type: Sequelize.BLOB, allowNull: true },
   }, {
-    // don't use camelcase for automatically added attributes but underscore style
-    // so updatedAt will be updated_at
-    underscored: true,
+    
+    timestamps: false,
 
-    // disable the modification of tablenames; By default, sequelize will automatically
-    // transform all passed model names (first parameter of define) into plural.
-    // if you don't want that, set the following
+    // 테이블 이름 그대로
+    // 그 몽고디비처럼 복수로 저장되고 그런거 아님
     freezeTableName: true,
 
     // define the table's name
