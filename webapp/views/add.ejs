@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>HANIUM | Add</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+
+<div class="search" style="background-color:PapayaWhip;">
+  <input type="text" id="uid">
+  <button type="button" onclick=searchFav()>검색</button>
+  <p id="result"></p>
+</div>
+
+<div class="searchResult" style="background-color:PeachPuff;">
+  <p id="uname"></p>
+  <p id="company"></p>
+  <p id="department"></p>
+  <p id="position"></p>
+  <button type="button" id="addFav">추가하기</button>
+</div>
+<p> </p>
+<div class="myFav" style="background-color:SandyBrown;">
+  <table id="Fav">
+    <tr>
+      <th>이름</th>
+      <th>회사</th>
+      <th>부서</th>
+      <th>직책</th>
+    </tr>
+  </table>
+</div>
+
+<!-- jQuery -->
+<script src="/plugins/jquery/jquery.min.js"></script>
+
+<!-- function script -->
+<script>
+
+  // 즐겨찾는 계정 전체 검색
+  function printFavorite(){
+
+    $("#Fav").find("tr:gt(0)").remove(); // 첫번째행 빼고 다 지우기
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "/add/favorite",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Postman-Token": "3a24d6f9-c770-48f6-9f47-2f5a2054b8dc"
+      }
+    }
+
+    // response
+    // 검색 성공시: [{userid, username, comname, department, position}]
+    // 검색 실패시: {message: ""}
+    $.ajax(settings).done(function (response) {
+      for(var i=0; i<response.length; i++){
+        var data = `
+        <tr>
+          <td>${response[i].username}</td>
+          <td>${response[i].comname}</td>
+          <td>${response[i].department}</td>
+          <td>${response[i].position}</td>
+          <td><button type="button" onclick=delFav(${response[i].unum})>삭제</button></td>
+        </tr>
+        `
+        $("#Fav").append(data);
+      }
+    });
+  }
+
+  // 아이디로 계정 검색
+  function searchFav(){
+    var uid = $('#uid').val();
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "/add/search",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Conthol": "no-cache",
+        "Postman-Token": "4bb75ee8-28d5-4be9-b720-41b40830f218"
+      },
+      "processData": false,
+      "data": `{\n\t\"uid\": \"${uid}\"\n}`
+    }
+
+    // response
+    // 검색 성공시: {unum, userid, username, comname, department, position}
+    // 검색 실패시: {message: ""}
+    $.ajax(settings).done(function(response) {
+      if(response.message) { //에러 메세지는 message에 저장됩니다. message가 있음 에러난거임.
+        $("#result").text("결과: "+response.message);
+        $("#uname").text("");
+        $("#company").text("");
+        $("#department").text("");
+        $("#position").text("");
+        $('#addFav').hide();
+      } else { // message 없으면 검색 결과가 반환된거.
+        $("#result").text("결과: 성공");
+        $("#uname").text(response.username);
+        $("#company").text(response.comname);
+        $("#department").text(response.department);
+        $("#position").text(response.position);
+        // 이미지는 추후에 작업할테니 아무거나 폴더에서 끌어와서 작업바람.
+        $('#addFav').removeAttr('onclick'); //원래 있는 onclick 함수 삭제하고
+        $('#addFav').attr('onClick', `addFav(${response.unum})`); //검색한 계정의 unum으로 파라미터 수정
+        $('#addFav').show(); //추가하기 버튼 까꿍
+      }
+    });
+  };
+
+  // 즐겨찾는 계정 추가하기
+  // 파라미터: 검색시 수정했던 친구의 unum
+  function addFav(fnum){
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "/add/favorite",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Conthol": "no-cache",
+        "Postman-Token": "92a89799-3174-4146-8c20-9258ef3a7bfa"
+      },
+      "processData": false,
+      "data": `{\n\t\"fnum\": ${fnum}\n}`
+    }
+
+    // response
+    // 검색 성공시: null
+    // 검색 실패시: {message: ""}
+    $.ajax(settings).done(function (response) {
+      if(response){ //response가 있다는 것 자체가 에러난거임
+        alert(response.message);
+      } else {
+        printFavorite(); //즐겨찾는 계정 리스트 다시 프린트
+      }
+    });
+  };
+
+  // 즐겨찾는 계정 삭제
+  function delFav(fnum){
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": `/add/favorite?fnum=${fnum}`,
+      "method": "DELETE",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Postman-Token": "42821cee-7376-4895-b347-4bc505c0865e"
+      }
+    }
+
+    // response
+    // 검색 성공시: null
+    // 검색 실패시: {message: ""}
+    $.ajax(settings).done(function (response) {
+      if(response){ //response가 있다는 것 자체가 에러난거임
+        alert(response.message);
+      } else {
+        printFavorite(); //즐겨찾는 계정 리스트 다시 프린트
+      }
+    });
+  }
+
+</script>
+
+<!-- jquery script -->
+<script>
+
+  $(document).ready(function(){ // 처음 페이지 로드 시,
+    $('#addFav').hide(); // 추가버튼 없애주고
+    printFavorite(); // 즐겨찾는 계정 리스트 프린트
+  });
+
+</script>
+
+</body>
+</html>
