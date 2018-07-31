@@ -5,7 +5,7 @@ module.exports = function(models) {
 
 
   route.get('/', (req,res) => {
-    res.render('add');
+    res.render('add_friends');
   });
 
   route.get('/favorite', async (req,res) => {

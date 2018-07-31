@@ -59,7 +59,7 @@ app.use(flash());
 
 // 라우터 설정
 var loginRouter = require('./routes/login')(passport);
-var indexRouter = require('./routes/dashboard');
+var indexRouter = require('./routes/index');
 var groupRouter = require('./routes/group')(models);
 var favoriteRouter = require('./routes/favorite')(models);
 var addRouter = require('./routes/add')(models);

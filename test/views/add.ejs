@@ -38,7 +38,7 @@
 <p>---------↑즐겨찾는 계정---------------↓그룹---------------------</p>
 
 <div>
-  <table id="group">
+  <table id="group" border="1px solid black">
     <tr>
       <th>그룹</th>
       <th>이름</th>
@@ -83,7 +83,7 @@
           <td>${response[i].comname}</td>
           <td>${response[i].department}</td>
           <td>${response[i].position}</td>
-          <td><button type="button" onclick=delFav(${response[i].unum})>삭제</button></td>
+          <td><button type="button" onclick="delFav(${response[i].unum})">삭제</button></td>
         </tr>
         `
         $("#fav").append(data);
@@ -102,29 +102,43 @@
       "method": "GET",
       "headers": {
         "Content-Type": "application/json",
-        "Cache-Control": "no-cache",
-        "Postman-Token": "3a24d6f9-c770-48f6-9f47-2f5a2054b8dc"
+        "Cache-Control": "no-cache"
       }
     }
 
     // response
-    // 검색 성공시: [{groupname, username, comname, department, position}]
+    // 검색 성공시: {groupname: [{username, comname, department, position}]}
     // 검색 실패시: {message: ""}
     $.ajax(settings).done(function (response) {
-      for(var i=0; i<response.length; i++){
-        var data = `
-        <tr>
-          <td>${response[i].groupname}</td>
-          <td>${response[i].username}</td>
-          <td>${response[i].comname}</td>
-          <td>${response[i].department}</td>
-          <td>${response[i].position}</td>
-        </tr>
-        `
-        $("#group").append(data);
+      for (var key in response) {
+        var group = response[key];
+        for(var i=0; i<group.length; i++){
+          if(i==0) {
+            var data = `
+            <tr>
+              <td rowspan=${group.length}>${key}</td>
+              <td>${group[i].username}</td>
+              <td>${group[i].comname}</td>
+              <td>${group[i].department}</td>
+              <td>${group[i].position}</td>
+              <td rowspan=${group.length}><button type="button" onclick=delGroup("${key}")>삭제</button></td>
+            </tr>
+            `
+          } else {
+            var data = `
+            <tr>
+              <td>${group[i].username}</td>
+              <td>${group[i].comname}</td>
+              <td>${group[i].department}</td>
+              <td>${group[i].position}</td>
+            </tr>
+            `
+          }
+          $("#group").append(data);
+        }
       }
     });
-  }
+  };
 
   // 아이디로 계정 검색
   function searchFav(){
@@ -224,7 +238,36 @@
         printFavorite(); //즐겨찾는 계정 리스트 다시 프린트
       }
     });
-  }
+  };
+
+  // 그룹 삭제
+  function delGroup(gname){
+    try {
+      var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": `/add/group?gname=${gname}`,
+        "method": "DELETE",
+        "headers": {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        }
+      }
+
+      // response
+      // 검색 성공시: null
+      // 검색 실패시: {message: ""}
+      $.ajax(settings).done(function (response) {
+        if(response){ //response가 있다는 것 자체가 에러난거임
+          alert(response.message);
+        } else {
+          printGroup(); //그룹 리스트 다시 프린트
+        }
+      });
+    } catch(err) {
+      alert(err);
+    }
+  };
 
   function check(self){
     $(self).toggle("fast", function(self){
@@ -240,7 +283,7 @@
   $(document).ready(function(){ // 처음 페이지 로드 시,
     $('#addFav').hide(); // 추가버튼 없애주고
     printFavorite(); // 즐겨찾는 계정 리스트 프린트
-    printGroup();
+    printGroup(); //그룹 리스트 프린트
   });
 
 </script>

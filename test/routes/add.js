@@ -91,12 +91,25 @@ module.exports = function(models) {
 
   // 그룹 목록
   route.get('/group', async (req,res) => {
-    var comm = `SELECT G.groupname, U.username, U.comname, U.department, U.position \
-    FROM commit.group AS G JOIN commit.user AS U \
-    ON G.unum = U.unum \
-    WHERE G.gnum=${req.user.unum};`;
-    results = await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT })
-    if(results) { res.json(results) }
+    var results = await models.Group.findAll({
+      attributes: ['groupname'],
+      include: [{
+        model: models.User,
+        attributes: ['username', 'comname', 'department', 'position'],
+      }],
+      where: {gnum: req.user.unum}
+    });
+    if(results) {
+      data = {}
+      for(var i=0;i<results.length;i++){
+        if(!(results[i].groupname in data)){
+          data[results[i].groupname] = new Array(results[i].User);
+        } else {
+          data[results[i].groupname].push(results[i].User);
+        }
+      }
+      res.send(data);
+    }
   });
 
   // 그룹 추가
@@ -117,6 +130,31 @@ module.exports = function(models) {
   //     res.send({message: req.flash('addError')});
   //   }
   // });
+
+  // 그룹 삭제
+  route.delete('/group', async (req,res) => {
+    console.log(req.query.gname);
+    try {
+      await models.Group.findAll(
+        {
+          where: {
+            gnum: req.user.unum,
+            groupname: req.query.gname
+          }
+        })
+        .then(fav => {
+          console.log(fav);
+          for(var f in fav){
+            f.destroy();
+          }
+        })
+      return res.send(null);
+    } catch(err) {
+      console.log(err);
+      req.flash('delError', '삭제 문제 발생 영원한 친구 오오오');
+      return res.send({message: req.flash('delError')});
+    }
+  });
 
   return route;
 };
