@@ -31,14 +31,14 @@ module.exports = function(models) {
 
   // 자신이 속한 그룹 보여주는 것.
   // route.get('/find', async (req,res) => {
-  //   var result = await models.Group.findAll({
-  //     attributes: ['groupname'],
-  //     include: [{
-  //       model: models.User,
-  //       attributes: ['username'],
-  //     }],
-  //     where: {gnum: req.user.unum}
-  //   });
+    // var result = await models.Group.findAll({
+    //   attributes: ['groupname'],
+    //   include: [{
+    //     model: models.User,
+    //     attributes: ['username'],
+    //   }],
+    //   where: {gnum: req.user.unum}
+    // });
   //   res.send(result);
   // });
 

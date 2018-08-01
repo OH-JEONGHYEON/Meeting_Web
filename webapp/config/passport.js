@@ -30,7 +30,7 @@ module.exports = function(passport, User) {
         },
         async function(req, id, password, done) {
           var user = await User.findOne({
-            where: {userid: id}
+            where: {uid: id}
           });
 
           if(!user){
@@ -46,7 +46,7 @@ module.exports = function(passport, User) {
       ));
 
     // 회원가입 전략
-    passport.use('signup', new LocalStrategy({
+    passport.use('register', new LocalStrategy({
         usernameField : 'id',
         passwordField : 'password',
         passReqToCallback : true, // req 사용함
@@ -56,7 +56,7 @@ module.exports = function(passport, User) {
       try{
         // 같은 아이디가 있으면 실패
         var user = await User.findOne({
-          where: {userid: id}
+          where: {uid: id}
         });
         if(user && user.length) {
           return done(null, false, req.flash('resError', '이미 존재하는 아이디입니다.'));
@@ -69,13 +69,13 @@ module.exports = function(passport, User) {
 
         // 새로운 계정 추가
         await User.create({
-          userid: id,
+          uid: id,
           pw: bcrypt.hashSync(password, bcrypt.genSaltSync(8), null),
-          username: req.body.name,
-          comname: req.body.company,
+          uname: req.body.name,
+          company: req.body.company,
           department: req.body.department,
           position: req.body.position,
-          userimage: "",
+          uimage: "",
         })
           .then(user => {
             return done(null, user.dataValues);

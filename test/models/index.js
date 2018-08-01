@@ -30,9 +30,9 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
-// db['sequelize'] = sequelize
-// db.User.hasMany(db.Group, { foreignKey: 'unum'});
-// db.Group.belongsTo(db.User, {foreingKey: 'unum'});
+db['sequelize'] = sequelize
+db.User.hasMany(db.Group, { foreignKey: 'unum'});
+db.Group.belongsTo(db.User, {foreingKey: 'unum'});
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
