@@ -1,21 +1,19 @@
 module.exports = function (sequelize, Sequelize) {
   const user = sequelize.define('User', {
     unum: { field: 'unum', type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    userid: { field: 'userid', type: Sequelize.STRING(45), unique: true, allowNull: false },
+    uid: { field: 'uid', type: Sequelize.STRING(45), unique: true, allowNull: false },
     pw: { field: 'pw', type: Sequelize.STRING(225), allowNull: false },
-    username: {field: 'username', type: Sequelize.STRING(45), allowNull: false },
-    comname: {field: 'comname', type: Sequelize.STRING(255), allowNull: false },
+    uname: {field: 'uname', type: Sequelize.STRING(45), allowNull: false },
+    company: {field: 'company', type: Sequelize.STRING(255), allowNull: false },
     department: {field: 'department', type: Sequelize.STRING(125), allowNull: false },
     position: {field: 'position', type: Sequelize.STRING(45), allowNull: false },
-    userimage: {field: 'userimage', type: Sequelize.BLOB, allowNull: true },
+    uimage: {field: 'uimage', type: Sequelize.BLOB, allowNull: true },
   }, {
-    // don't use camelcase for automatically added attributes but underscore style
-    // so updatedAt will be updated_at
-    underscored: true,
+    //생성 시간 수정시간 사용 x
+    timestamps: false,
 
-    // disable the modification of tablenames; By default, sequelize will automatically
-    // transform all passed model names (first parameter of define) into plural.
-    // if you don't want that, set the following
+    // 테이블 이름 그대로
+    // 그 몽고디비처럼 복수로 저장되고 그런거 아님
     freezeTableName: true,
 
     // define the table's name

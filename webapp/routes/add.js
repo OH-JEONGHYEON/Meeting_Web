@@ -5,13 +5,14 @@ module.exports = function(models) {
 
 
   route.get('/', (req,res) => {
-    res.render('add_friends');
+    res.render('add');
   });
 
   route.get('/favorite', async (req,res) => {
     try {
-      var comm = `SELECT U.unum, U.userid, U.username, U.comname, U.department, U.position \
-      FROM commit.favorite JOIN commit.user AS U ON favorite.fnum = U.unum;`;
+      var comm = `SELECT U.unum, U.uid, U.uname, U.company, U.department, U.position \
+      FROM commit.favorite JOIN commit.user AS U ON favorite.fnum = U.unum \
+      WHERE favorite.unum=${req.user.unum};`;
       var results = await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT });
       if(results) { res.send(results); }
     } catch(err){
@@ -23,8 +24,8 @@ module.exports = function(models) {
   route.post('/search', async (req,res) => {
     try {
       var user = await models.User.findOne({
-        where: { userid: req.body.uid },
-        attributes: ['unum','username', 'comname', 'department', 'position'],
+        where: { uid: req.body.uid },
+        attributes: ['unum','uname', 'company', 'department', 'position'],
         raw: true
       });
       if(user) {

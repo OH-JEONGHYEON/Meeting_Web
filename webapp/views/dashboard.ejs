@@ -29,7 +29,7 @@
 <div class="wrapper">
 
   <!--nav + search + side-->
-  <% include ./plain.ejs %>
+  <% include ./nav.ejs %>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -57,9 +57,9 @@
                 <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
                 <div class="row-eq-height">
                   <span class="username">
-                    <a href="#"><%= info.username %></a>
+                    <a href="#"><%= info.uname %></a>
                   </span>
-                  <span class="description d-block"><%= info.comname+'/'+info.department+'/'+info.position %></span>
+                  <span class="description d-block"><%= info.company+'/'+info.department+'/'+info.position %></span>
                 </div>
               </div>
               <div class="col-sm-3 row-eq-height">

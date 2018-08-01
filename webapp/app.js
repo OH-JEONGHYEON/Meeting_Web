@@ -48,25 +48,20 @@ models.sequelize.sync()
     process.exit();
   })
 
-// passport 모듈 설정
-// user 테이블 사용
+var flash = require('connect-flash');
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session()); //로그인 세션 유지
 require('./config/passport')(passport, models.User);
-//플래시메세지를 사용한다면
-var flash = require('connect-flash');
-app.use(flash());
 
-// 라우터 설정
+
 var loginRouter = require('./routes/login')(passport);
-var indexRouter = require('./routes/index');
-var groupRouter = require('./routes/group')(models);
-var favoriteRouter = require('./routes/favorite')(models);
+var registerRouter = require('./routes/register')(passport);
+var dashboardRouter = require('./routes/dashboard');
 var addRouter = require('./routes/add')(models);
-app.use(['/login', '/'], loginRouter);
-app.use('/index', indexRouter);
-app.use('/group', groupRouter);
-app.use('/favorite', favoriteRouter);
+app.use('/login', loginRouter);
+app.use('/register', registerRouter);
+app.use(['/dashboard', '/'], dashboardRouter);
 app.use('/add', addRouter);
 
 // catch 404 and forward to error handler
