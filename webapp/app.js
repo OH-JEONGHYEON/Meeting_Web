@@ -59,10 +59,14 @@ var loginRouter = require('./routes/login')(passport);
 var registerRouter = require('./routes/register')(passport);
 var dashboardRouter = require('./routes/dashboard');
 var addRouter = require('./routes/add')(models);
+var meetRouter = require('./routes/meet')(models);
+var addSampleRouter = require('./routes/addSample')(models);
 app.use('/login', loginRouter);
 app.use('/register', registerRouter);
 app.use(['/dashboard', '/'], dashboardRouter);
 app.use('/add', addRouter);
+app.use('/meet', meetRouter);
+app.use('/addSample', addSampleRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

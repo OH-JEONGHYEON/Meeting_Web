@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>HANIUM</title>
+  <title>Favorite&Group</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome -->
@@ -20,14 +20,14 @@
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
   <!-- Select2 -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet">
 
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
 
   <!--nav + search + side-->
-  <% include ./nav.ejs %>
+  <%- include ./nav.ejs %>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -92,12 +92,15 @@
                       <div class="col-sm-12 table-responsive">
                         <div id="Group_wrapper" class="dataTables_wrapper no-footer">
                           <!-- 그룹 리스트 -->
-                          <table id="Group" class="table table-striped" cellspacing="0" width="100%">
+                          <table id="group" class="table table-striped" cellspacing="0" width="100%">
                             <thead>
                                 <tr>
-                                    <th>그룹이름</th> <!--그룹이름-->
-                                    <th>멤버</th> <!--그룹멤버-->
-                                    <!-- <th style="width: 60px"></th> 삭제버튼 -->
+                                    <th>그룹</th>
+                                    <th>이름</th>
+                                    <th>회사</th>
+                                    <th>부서</th>
+                                    <th>직책</th>
+                                    <th style="width: 60px"></th>
                                 </tr>
                             </thead>
                           </table>
@@ -198,7 +201,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
-        <form action="/group/add" method="post">
+        <form action="/add/group" method="post">
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <label class="input-group-text">그룹명</label>
@@ -206,27 +209,10 @@
             <input type="text" class="form-control" placeholder="그룹명을 입력해주세요" name="groupname" id="gname">
           </div>
           <div class="form-group mb-3">
-            <select class=" form-control select2" multiple="multiple" data-placeholder="Selct fav" id="selOption" style="width: 100%">
-              <option>크러쉬</option>
-              <option>박서준</option>
-              <option>황민현</option>
-              <option>백승호</option>
+            <select id="sel_fav" class="select2 form-control" multiple="multiple" style="width: 100%">
             </select>
           </div>
-          <!-- 원래 쓰려했던 table... select가 가능하다면 지울 예정!
-          <table id="selFav" class="table table-striped" cellspacing="0" width="100%">
-            <thead>
-              <tr role="row">
-                <th aria-controls="selFav">이름</th>
-                <th aria-controls="selFav">회사</th>
-                <th aria-controls="selFav">부서</th>
-                <th aria-controls="selFav">직책</th>
-                <th style="width: 60px"></th>
-              </tr>
-            </thead>
-          </table>
-        -->
-          <button type="submit" class="btn btn-info float-right" data-dismiss="modal" id="group-modal-submit">추가</button>
+          <button type="submit" id="addGroup" class="btn btn-info float-right" data-dismiss="modal">추가</button>
         </form>
       </div>
     </div>
@@ -268,6 +254,7 @@
         $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
     } );
 
+
   // 즐겨찾는 계정 전체 검색
   function printFavorite(){
 
@@ -303,6 +290,57 @@
       }
     });
   }
+
+
+  function printGroup(){
+
+    $("#group").find("tr:gt(0)").remove();
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "/add/group",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
+      }
+    }
+
+    // response
+    // 검색 성공시: {groupname: [{username, comname, department, position}]}
+    // 검색 실패시: {message: ""}
+    $.ajax(settings).done(function (response) {
+      for (var key in response) {
+        var group = response[key];
+        for(var i=0; i<group.length; i++){
+          if(i==0) {
+            var data = `
+            <tr>
+              <td rowspan=${group.length}>${key}</td>
+              <td>${group[i].uname}</td>
+              <td>${group[i].company}</td>
+              <td>${group[i].department}</td>
+              <td>${group[i].position}</td>
+              <td rowspan=${group.length}><button type="button" class="btn btn-tool" onclick=delGroup("${key}")><i class="fa fa-times"></i></button></td>
+            </tr>
+            `
+          } else {
+            var data = `
+            <tr>
+              <td>${group[i].uname}</td>
+              <td>${group[i].company}</td>
+              <td>${group[i].department}</td>
+              <td>${group[i].position}</td>
+            </tr>
+            `
+          }
+          $("#group").append(data);
+        }
+      }
+    });
+  };
+
 
   // 아이디로 계정 검색
   function searchFav(){
@@ -407,70 +445,107 @@
     });
   }
 
+  // 그룹 삭제
+  function delGroup(gname){
+    try {
+      var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": `/add/group?gname=${gname}`,
+        "method": "DELETE",
+        "headers": {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        }
+      }
 
-$(document).ready(function() {
+      // response
+      // 검색 성공시: null
+      // 검색 실패시: {message: ""}
+      $.ajax(settings).done(function (response) {
+        if(response){ //response가 있다는 것 자체가 에러난거임
+          alert(response.message);
+        } else {
+          printGroup(); //그룹 리스트 다시 프린트
+        }
+      });
+    } catch(err) {
+      alert(err);
+    }
+  };
 
-    //그룹 테이블
-    $('#groupTable').DataTable( {
-        "ajax": {
-          "url": '/group/find/query',
-          "dataSrc" : "",
-        },
-        "columns": [
-          { "data": "groupname" },
-          { "data": "member" }
-        ],
-        "scrollY":        200,
-        "scrollCollapse": true,
-        "paging":         false
-    });
-
-    /* 이곳 역시 select2 성공시 삭제 예정~
-    //그룹추가-참여자 선택을 위한 친구 테이블
-    var table2 = $('#favoriteTable2').DataTable( {
-        "ajax": {
-          "url": '/favorite/find',
-          "dataSrc" : "",
-        },
-        "columns": [
-          { "data": "username" },
-          { "data": "comname" },
-          { "data": "department" },
-          { "data": "position" }
-        ],
-        "scrollY":        200,
-        "scrollCollapse": true,
-        "paging":         false
-    });
-    //선택한 행
-    $('#favoriteTable2 tbody').on( 'click', 'tr', function () {
-        $(this).toggleClass('selected');
-    } );
-    //'추가'버튼 클릭시 서버로 전달되는 data (member)
-    $('#group-modal-submit').click( function () {
-        var member = table2.rows('.selected').data();
-        alert(
-          "다음의 데이터가 서버에 제출되었습니다: \n\n"+member.substr(0, 120)+'...'
-          );
-        return false;
-    } );
-    */
-
-});
 </script>
 <!-- jquery script -->
+<script>
+  //그룹 추가를 위한 친구 선택란
+  $(document).ready(function(){
+    $("#sel_fav").select2({
+      placeholder: "이름검색하구 선택하슈ㅠ", 
+      allowClear: true, //선택 해제
+    });
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "/add/favorite",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Postman-Token": "3a24d6f9-c770-48f6-9f47-2f5a2054b8dc"
+      }
+    }
+
+    // response
+    // 검색 성공시: [{userid, username, comname, department, position}]
+    // 검색 실패시: {message: ""}
+    $.ajax(settings).done(function (response) {
+      for(var i=0; i<response.length; i++){
+        //옵션으로 친구 이름만 띄운다
+        var data = `<option>${response[i].uname}</option>`
+        $("#sel_fav").append(data);
+      }
+    });
+    
+
+    //---------------addGroup----------------
+    // addGroup 버튼 클릭 시 sel_fav에서 골랐던 옵션 전달
+    // 그룹명 포함 안되어있음..!
+    $('#addGroup').click(function(){
+      //선택된 옵션이 있을 경우,
+      if($('#sel_fav : selected').length > 0) {
+        //선택된 옵션 배열 만들기
+        var selectedFav = [];
+        $('#sel_fav : selected').each(function (i, selected) {
+          selectedFav[i] = $(selected).val();
+        });
+
+        $.ajax({
+          url: "/add/group", 
+          data: {
+            'selectedFav': JSON.stringify(selectedFav)
+          }, 
+          type: 'POST', 
+          success: function(data) {
+            alert('Success!');
+          }
+        });
+      }
+      //alert(JSON.stringify(selectedFav));
+    });
+
+  });
+
+</script>
+
 <script>
 
   $(document).ready(function(){ // 처음 페이지 로드 시,
     $('#resultFav').hide(); // 아이디 검색결과 테이블 틀 없애주고
     $('#addFav').hide(); // 추가버튼 없애주고
     printFavorite(); // 즐겨찾는 계정 리스트 프린트
+    printGroup(); //그룹 리스트 프린트
   });
-
-  $(function () {
-    //Initialize Select2 Elements
-    $('.select2').select2();
-  })
 
 </script>
 

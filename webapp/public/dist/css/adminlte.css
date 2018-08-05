@@ -12230,7 +12230,7 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 .login-page,
 .register-page {
-  background: linear-gradient(#fff587, #228f7f);
+  /*background: linear-gradient(#fff587, #228f7f);*/
 }
 
 .login-box,

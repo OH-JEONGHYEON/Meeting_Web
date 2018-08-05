@@ -1,8 +1,8 @@
 module.exports = function (sequelize, Sequelize) {
   const group = sequelize.define('Group', {
-    unum: { field: 'unum', type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    groupname: { field: 'groupname', type: Sequelize.STRING(45), unique: false, allowNull: false },
-    member: { field: 'member', type: Sequelize.INTEGER, unique: false, allowNull: false},
+    gnum: { field: 'gnum', type: Sequelize.INTEGER, unique: false, allowNull: false },
+    gname: { field: 'gname', type: Sequelize.STRING(45), unique: false, allowNull: false },
+    UserUnum: { field: 'unum', type: Sequelize.INTEGER, unique: false, allowNull: false},
   }, {
 
     timestamps: false,

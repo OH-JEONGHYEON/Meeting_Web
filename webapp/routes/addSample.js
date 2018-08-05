@@ -6,10 +6,7 @@ module.exports = function(models) {
 
   // 즐겨찾는 계정 및 그룹 추가 페이지
   route.get('/', (req,res) => {
-    res.render('add', {
-      info: req.user, 
-      title: 'Favorite&Group'
-    });
+    res.render('addSample');
   });
 
   // 즐겨찾는 계정 목록
@@ -19,13 +16,12 @@ module.exports = function(models) {
       FROM commit.favorite JOIN commit.user AS U ON favorite.fnum = U.unum \
       WHERE favorite.unum=${req.user.unum};`;
       var results = await models.sequelize.query(comm, { type: models.sequelize.QueryTypes.SELECT });
-      if(results) { console.log(results); res.send(results); }
+      if(results) { res.send(results); }
     } catch(err){
       req.flash('findError', '친구목록을 불러오는데 실패했습니다.');
       return res.send({message: req.flash('findError')});
     }
   });
-
 
   // 아이디로 친구 검색
   route.post('/search', async (req,res) => {
